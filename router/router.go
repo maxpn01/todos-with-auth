@@ -8,17 +8,22 @@ import (
 
 func Router(db *sql.DB) http.Handler {
 	mux := http.NewServeMux()
-	todoHandler := handlers.TodoHandler{DB: db}
+
+	handler := handlers.Handler{DB: db}
 
 	fileServer := http.FileServer(http.Dir("./static"))
 
 	mux.Handle("GET /", fileServer)
-	mux.HandleFunc("GET /api/health", handlers.HealthHandler)
-	mux.HandleFunc("GET /api/todo/{id}", todoHandler.GetTodo)
-	mux.HandleFunc("GET /api/todos", todoHandler.GetTodos)
-	mux.HandleFunc("POST /api/todo/create", todoHandler.CreateTodo)
-	mux.HandleFunc("PUT /api/todo/update/{id}", todoHandler.UpdateTodo)
-	mux.HandleFunc("DELETE /api/todo/delete/{id}", todoHandler.DeleteTodo)
+
+	mux.HandleFunc("GET /api/todo/{id}", handler.GetTodo)
+	mux.HandleFunc("GET /api/todos", handler.GetTodos)
+	mux.HandleFunc("POST /api/todo/create", handler.CreateTodo)
+	mux.HandleFunc("PUT /api/todo/update/{id}", handler.UpdateTodo)
+	mux.HandleFunc("DELETE /api/todo/delete/{id}", handler.DeleteTodo)
+
+	mux.HandleFunc("POST /api/auth/signup", handler.Signup)
+	mux.HandleFunc("POST /api/auth/signin", handler.Signin)
+	mux.HandleFunc("POST /api/auth/signout", handler.Signout)
 
 	return mux
 }
